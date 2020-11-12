@@ -1,35 +1,59 @@
 <template>
-    <section>
-    <md-autocomplete
-      v-model="selectedCity"
-      :md-options="cities"
-      md-layout="box"
-      md-dense>
-      <label>Search</label>
-    </md-autocomplete>
-
-    </section>
+    <div class="center">
+        <section>
+            <md-autocomplete
+                class="search"
+                v-model="userInput"
+                :md-options="cities"
+                @input="requestCities"
+                
+                md-layout="box"
+                md-dense>
+                <label>Search</label>
+                <template slot="md-autocomplete-item" slot-scope="{item}">{{item.GeoObject.name}}</template>
+            </md-autocomplete>
+        </section>
+    </div>
 </template>
 
 <script>
-// import { MdAutocomplete } from 'vue-material/dist/components';
+
 export default {
-    name: 'AutocompleteBox',
+    name: 'AutocompleteAsync',
     data: () => {
         return {
-            selectedCity: null,
-            cities: ['Sochi', 'Moscow', 'Tel-Aviv', 'Beijing']
+            userInput: '',
+            cities: []
         }
     },
-    // components: {
-    //     MdAutocomplete
-    // }
+    methods: {
+        requestCities(searchTerm) {
+            const URL = 'https://geocode-maps.yandex.ru/1.x/';
+
+            this.cities = new Promise(resolve => {
+                if (!searchTerm || (searchTerm.length <= 2)) {
+                    resolve([{GeoObject:{name: 'Type 3 or more letters'}}])
+                } else {
+                    fetch(`${URL}?geocode=${searchTerm}&format=json&apikey=0aa5a112-1461-4070-ae3d-31b73d94583c`)
+                        .then(res => res.json())
+                        .then(payload => resolve(payload.response.GeoObjectCollection.featureMember))
+                }
+            })
+        }
+    }
 }
 </script>
 
-<style lang="scss">
+<style lang="scss" scoped>
+
+    .center {
+        display: flex;
+        justify-content: center;
+        width: 100%;
+        margin-top: 10vh;
+    }
     .search {
-        max-width: 500px;
+        width: 500px;
     }
 
 
