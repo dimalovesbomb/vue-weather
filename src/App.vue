@@ -1,12 +1,18 @@
 <template>
   <div id="app">
-    <div id="nav">
-      <router-link to="/">Home</router-link> |
-      <router-link to="/about">About</router-link>
-    </div>
+    <Searchbar />
     <router-view/>
   </div>
 </template>
+
+<script>
+import Searchbar from '@/components/Searchbar';
+export default {
+  components: {
+    Searchbar
+  }
+}
+</script>
 
 <style lang="scss">
 #app {
