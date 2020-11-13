@@ -5,12 +5,12 @@
                 class="search"
                 v-model="userInput"
                 :md-options="cities"
-                @input="requestCities"
-                
+                @md-changed="requestCities"
+                @md-selected="onSelectCity"
                 md-layout="box"
                 md-dense>
                 <label>Search</label>
-                <template slot="md-autocomplete-item" slot-scope="{item}">{{item.GeoObject.name}}</template>
+                <template slot="md-autocomplete-item" slot-scope="{item}">{{`${item.GeoObject.name}, ${item.GeoObject.description}`}}</template>
             </md-autocomplete>
         </section>
     </div>
@@ -32,13 +32,19 @@ export default {
 
             this.cities = new Promise(resolve => {
                 if (!searchTerm || (searchTerm.length <= 2)) {
-                    resolve([{GeoObject:{name: 'Type 3 or more letters'}}])
+                    resolve([{GeoObject:{name: 'Type 3 or more letters', description: ''}}])
                 } else {
                     fetch(`${URL}?geocode=${searchTerm}&format=json&apikey=0aa5a112-1461-4070-ae3d-31b73d94583c`)
                         .then(res => res.json())
                         .then(payload => resolve(payload.response.GeoObjectCollection.featureMember))
+                        .catch(error => console.error(error));
                 }
             })
+        },
+        onSelectCity(object) {
+            this.userInput = object.GeoObject.name;
+
+            this.$emit('select-city', object);
         }
     }
 }
@@ -50,10 +56,10 @@ export default {
         display: flex;
         justify-content: center;
         width: 100%;
-        margin-top: 10vh;
+        padding-top: 10vh;
     }
     .search {
-        width: 500px;
+        width: 700px;
     }
 
 
