@@ -2,9 +2,10 @@
   <div id="app">
     <h1 class="header">Погода</h1>
     <Searchbar @select-city="pushSelectedCity"
-               :initialCityName="initialCityName"/>
+               :initialCityName="initialCityName" />
     <Result v-if="weatherResult.length"
             @slide-change="updateUrl"
+            :initialSlideIndex="initialSlideIndex"
             :weatherResult="weatherResult" />
     <router-view/>
   </div>
@@ -20,16 +21,19 @@ export default {
     return {
       city: {},
       weatherResult: [],
-      initialCityName: ''
+      initialCityName: '',
+      initialSlideIndex: 0,
     }
   },
   watch: {
     city(value) {
-      this.getWeatherByCoords(value.GeoObject.Point.pos);
+      if (value) {
+        this.getWeatherByCoords(value.GeoObject.Point.pos);
+      }
     },
-    weatherResult(value) {
-      console.log(value);
-    }
+    // weatherResult(value) {
+    //   console.log(value);
+    // }
   },
   mounted() {
     if ( !Object.keys(this.$route.query).length ) {
@@ -60,13 +64,20 @@ export default {
 
       await fetch(`${url}?geocode=${lon},${lat}&kind=${kind}&lang=${lang}&format=${format}&apikey=${apikey}`)
         .then(res => res.json())
-        .then(res => this.initialCityName = res.response.GeoObjectCollection.featureMember[0].GeoObject.name)
+        .then(res => {
+          this.initialCityName = res.response.GeoObjectCollection.featureMember[0].GeoObject.name;
+          this.city = res.response.GeoObjectCollection.featureMember[0];
+        })
         .catch(error => console.error(error));
     },
     updateUrl(activeSlide) {
       const [lon, lat] = this.city.GeoObject.Point.pos.split(' ');
-      this.$router.push(`/?slideIndex=${activeSlide}&lon=${lon}&lat=${lat}`);
-      console.log(this.$route);
+      const url = {
+        slideIndex: activeSlide,
+        lon,
+        lat
+      };
+      this.$router.push({path: '/', query: {...url}});
     }
   },
   components: {

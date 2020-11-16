@@ -37,11 +37,7 @@
 
 <script>
   export default {
-    props: {
-        weatherResult: {
-            type: Array
-        }
-    },
+    props: ['weatherResult', 'initialSlideIndex'],
     data() {
       return {
         slides: [],
@@ -53,7 +49,7 @@
                 clickable: true,
             },
             on: {
-                init: () => console.log('init fired'),
+                init: this.initialSlideIndex ? this.initialSlideIndex : 0,
                 paginationUpdate: swiper => this.$emit('slide-change', swiper.activeIndex),
                 // progress: swiper => swiper.updateSlides(),
             }
@@ -67,6 +63,15 @@
     },
     mounted() {
         // this.swiper.slideTo(1, 1000, false)
+    },
+    methods: {
+        getInitialSlide() {
+            if (!initialSlideIndex) {
+                return 0;
+            }
+
+            return initialSlideIndex
+        }
     },
     filters: {
         parseDate(UTCstr) {

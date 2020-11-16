@@ -28,7 +28,8 @@ export default {
         }
     },
     mounted() {
-        console.log(typeof this.initialCityName);
+        console.log('FIRED', this.initialCityName);
+        this.userInput = this.initialCityName;
     },
     methods: {
         requestCities(searchTerm) {
