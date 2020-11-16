@@ -52,10 +52,12 @@
                 el: '.swiper-pagination',
                 clickable: true,
             },
+            on: {
+                init: () => console.log('init fired'),
+                paginationUpdate: swiper => this.$emit('slide-change', swiper.activeIndex),
+                // progress: swiper => swiper.updateSlides(),
+            }
         },
-        on: {
-            progress: swiper => swiper.updateSlides()
-        }
       }
     },
     computed: {
@@ -64,7 +66,7 @@
         }
     },
     mounted() {
-        this.swiper.slideTo(1, 1000, false)
+        // this.swiper.slideTo(1, 1000, false)
     },
     filters: {
         parseDate(UTCstr) {

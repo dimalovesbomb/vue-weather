@@ -17,24 +17,28 @@
 </template>
 
 <script>
-
+import Api from '@/api';
 export default {
     name: 'AutocompleteAsync',
+    props: ['initialCityName'],
     data: () => {
         return {
             userInput: '',
             cities: []
         }
     },
+    mounted() {
+        console.log(typeof this.initialCityName);
+    },
     methods: {
         requestCities(searchTerm) {
-            const URL = 'https://geocode-maps.yandex.ru/1.x/';
+            const { url, format, apikey } = Api.yandex;
 
             this.cities = new Promise(resolve => {
                 if (!searchTerm || (searchTerm.length <= 2)) {
                     resolve([{GeoObject:{name: 'Type 3 or more letters', description: ''}}])
                 } else {
-                    fetch(`${URL}?geocode=${searchTerm}&format=json&apikey=0aa5a112-1461-4070-ae3d-31b73d94583c`)
+                    fetch(`${url}?geocode=${searchTerm}&format=${format}&apikey=${apikey}`)
                         .then(res => res.json())
                         .then(payload => resolve(payload.response.GeoObjectCollection.featureMember))
                         .catch(error => console.error(error));

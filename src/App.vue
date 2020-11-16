@@ -1,7 +1,10 @@
 <template>
   <div id="app">
-    <Searchbar @select-city="pushSelectedCity" />
+    <h1 class="header">Погода</h1>
+    <Searchbar @select-city="pushSelectedCity"
+               :initialCityName="initialCityName"/>
     <Result v-if="weatherResult.length"
+            @slide-change="updateUrl"
             :weatherResult="weatherResult" />
     <router-view/>
   </div>
@@ -10,12 +13,14 @@
 <script>
 import Searchbar from '@/components/Searchbar';
 import Result from '@/components/Result';
+import Api from '@/api';
 
 export default {
   data() {
     return {
       city: {},
-      weatherResult: []
+      weatherResult: [],
+      initialCityName: ''
     }
   },
   watch: {
@@ -26,22 +31,42 @@ export default {
       console.log(value);
     }
   },
+  mounted() {
+    if ( !Object.keys(this.$route.query).length ) {
+      return;
+    }
+
+    const {lon, lat} = this.$route.query;
+    this.getCityByCoords(lon, lat);
+    
+    const lonLatToString = [lon, lat].join(' ');
+    this.getWeatherByCoords(lonLatToString);
+  },
   methods: {
     pushSelectedCity(cityObj) {
       this.city = cityObj;
     },
     getWeatherByCoords(coords) {
-      const URL = 'https://api.openweathermap.org/data/2.5/onecall';
-      const APP_ID = '09e9879c47b2100b6e33141332699804';
-      const exclude = 'current,minutely,hourly,alerts';
-      const units = 'metric';
-      const lang = 'ru';
       const [lon, lat] = coords.split(' ');
+      const { url, exclude, units, lang, appId } = Api.weathermap;
 
-      fetch(`${URL}?lat=${lat}&lon=${lon}&exclude=${exclude}&units=${units}&lang=${lang}&appid=${APP_ID}`)
+      fetch(`${url}?lat=${lat}&lon=${lon}&exclude=${exclude}&units=${units}&lang=${lang}&appid=${appId}`)
         .then(res => res.json())
         .then(res => this.weatherResult = res.daily)
         .catch(error => console.error(error));
+    },
+    async getCityByCoords(lon, lat) {
+      const { url, kind, lang, format, apikey } = Api.yandex;
+
+      await fetch(`${url}?geocode=${lon},${lat}&kind=${kind}&lang=${lang}&format=${format}&apikey=${apikey}`)
+        .then(res => res.json())
+        .then(res => this.initialCityName = res.response.GeoObjectCollection.featureMember[0].GeoObject.name)
+        .catch(error => console.error(error));
+    },
+    updateUrl(activeSlide) {
+      const [lon, lat] = this.city.GeoObject.Point.pos.split(' ');
+      this.$router.push(`/?slideIndex=${activeSlide}&lon=${lon}&lat=${lat}`);
+      console.log(this.$route);
     }
   },
   components: {
@@ -57,5 +82,10 @@ export default {
     -moz-osx-font-smoothing: grayscale;
     text-align: center;
     color: white;
+  }
+
+  .header {
+    margin-top: 0;
+    padding-top: 50px;
   }
 </style>
