@@ -49,7 +49,8 @@
                 clickable: true,
             },
             on: {
-                init: this.initialSlideIndex ? this.initialSlideIndex : 0,
+                // init: this.initialSlideIndex ? this.initialSlideIndex : 0,
+                init: this.getInitialSlide(),
                 paginationUpdate: swiper => this.$emit('slide-change', swiper.activeIndex),
                 // progress: swiper => swiper.updateSlides(),
             }
@@ -66,11 +67,12 @@
     },
     methods: {
         getInitialSlide() {
-            if (!initialSlideIndex) {
+            console.log(this.initialSlideIndex); // passed 0 anyway
+            if (!this.initialSlideIndex) {
                 return 0;
             }
 
-            return initialSlideIndex
+            return this.initialSlideIndex
         }
     },
     filters: {
