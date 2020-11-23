@@ -20,16 +20,24 @@
 import Api from '@/api';
 export default {
     name: 'AutocompleteAsync',
-    props: ['initialCityName'],
     data: () => {
         return {
             userInput: '',
             cities: []
         }
     },
-    mounted() {
-        console.log('FIRED', this.initialCityName);
-        this.userInput = this.initialCityName;
+    beforeMount() {
+        if (Object.keys(this.$route.query).length) {
+            const { lon, lat } = this.$route.query;
+            const { url, kind, lang, format, apikey } = Api.yandex;
+            
+            fetch(`${url}?geocode=${lon},${lat}&kind=${kind}&lang=${lang}&format=${format}&apikey=${apikey}`)
+                .then(res => res.json())
+                .then(res => {
+                    this.userInput = res.response.GeoObjectCollection.featureMember[0].GeoObject.name;
+                })
+                .catch(error => console.error(error));
+        }
     },
     methods: {
         requestCities(searchTerm) {

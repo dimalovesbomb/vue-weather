@@ -3,7 +3,6 @@
           <swiper class="swiper" ref="mySwiper" :options="swiperOptions">
             <swiper-slide class="weather__item" :key="slide.name" v-for="slide in weatherResult">
                 <p class="weather__item__time">{{slide.dt | parseDate}}</p>
-                <!-- <p>{{slide.weather[0].main}}</p> -->
 
                 <div v-if="slide.weather[0].main === 'Clouds'" class="icon cloudy">
                     <div class="cloud"></div>
@@ -40,7 +39,6 @@
     props: ['weatherResult', 'initialSlideIndex'],
     data() {
       return {
-        slides: [],
         swiperOptions: {
             slidesPerView : 4,
             slidesPerGroup: 1,
@@ -49,7 +47,6 @@
                 clickable: true,
             },
             on: {
-                init: this.getInitialSlide(), // doesnt work
                 paginationUpdate: swiper => this.$emit('slide-change', swiper.activeIndex),
             }
         },
@@ -61,16 +58,8 @@
         }
     },
     mounted() {
-        // this.swiper.slideTo(1, 1000, false)
-    },
-    methods: {
-        getInitialSlide() {
-            console.log(this.initialSlideIndex);//Works
-            if (!this.initialSlideIndex) {
-                return 0;
-            }
-
-            return this.initialSlideIndex
+        if (this.initialSlideIndex !== 0) {
+            this.swiper.slideTo(+this.initialSlideIndex, 500, false)
         }
     },
     filters: {
