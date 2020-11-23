@@ -40,6 +40,9 @@ export default {
       return;
     }
 
+    const {slideIndex} = this.$route.query;
+    this.initialSlideIndex = slideIndex;
+
     const {lon, lat} = this.$route.query;
     this.getCityByCoords(lon, lat);
     

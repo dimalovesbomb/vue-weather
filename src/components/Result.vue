@@ -49,10 +49,8 @@
                 clickable: true,
             },
             on: {
-                // init: this.initialSlideIndex ? this.initialSlideIndex : 0,
-                init: this.getInitialSlide(),
+                init: this.getInitialSlide(), // doesnt work
                 paginationUpdate: swiper => this.$emit('slide-change', swiper.activeIndex),
-                // progress: swiper => swiper.updateSlides(),
             }
         },
       }
@@ -67,7 +65,7 @@
     },
     methods: {
         getInitialSlide() {
-            console.log(this.initialSlideIndex); // passed 0 anyway
+            console.log(this.initialSlideIndex);//Works
             if (!this.initialSlideIndex) {
                 return 0;
             }
