@@ -98,6 +98,8 @@
     max-width: 1170px;
     padding-bottom: 100px;
 
+    // ::v-deep
+
     .swiper-pagination {
         top: 250px;
 
